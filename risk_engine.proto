@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "co.wdns.grpc_demo.risk_engine";
+option java_outer_classname = "RiskEngineProto";
+
+import "grpc-demo-protobuf/common.proto";
+
+package risk_engine;
+
+service RiskEngine {
+    rpc InteractivelyManageUsers(stream UserManagementRequest) returns (stream UserActivity) {}
+}
+
+message UserManagementRequest {
+    oneof block_or_unblock {
+        UserId block_user_id = 1;
+        UserId unblock_user_id = 2;
+    }
+}
+
+message UserActivity {
+    UserId user_id = 1;
+    Event event = 2;
+    repeated string data = 3;
+    enum Event {
+        REGISTERED = 0;
+        LOGGED_IN = 1;
+        LOGGED_OUT = 2;
+        GOT_BLOCKED = 3;
+        GOT_UNBLOCKED = 4;
+    }
+}

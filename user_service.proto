@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "co.wdns.grpc_demo.user_service";
+option java_outer_classname = "UserServiceProto";
+
+import "grpc-demo-protobuf/common.proto";
+
+package user_service;
+
+service UserService {
+    // Register a new user
+    rpc RegisterUser(UserRegistrationRequest) returns (UserRegistrationResult) {}
+    // login a registered user
+    rpc LoginUser(LoginUserAttempt) returns (LoginUserResult) {}
+    // logout a logged-in user
+    rpc LogoutUser(LogoutUserAttempt) returns (LogoutUserResult) {}
+}
+
+message UserRegistrationRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message UserRegistrationResult {
+    oneof registration_result {
+        AccessToken access_token = 1;
+        RegistrationFailureReason registration_failure = 2;
+    }
+}
+
+enum RegistrationFailureReason {
+    ALREADY_REGISTERED = 0;
+    PASSWORD_TOO_SIMPLE = 1;
+}
+
+message AccessToken {
+    AccessTokenId id = 1;
+    UserId user_id = 2;
+    uint64 expires = 3;
+    repeated string scope = 4;
+    repeated Claim claims = 5;
+}
+
+message AccessTokenId {
+    string id = 1;
+}
+
+message Claim {
+    string name = 1;
+    string value = 2;
+}
+
+message LoginUserAttempt {
+    string username = 1;
+    string password = 2;
+    string ip_address = 3;
+}
+
+message LoginUserResult {
+    oneof login_result {
+        AccessToken access_token = 1;
+        LoginFailureReason login_failure = 2;
+    }
+}
+
+enum LoginFailureReason {
+    USER_NOT_FOUND = 0;
+    BAD_PASSWORD = 1;
+    USER_LOCKED = 2;
+}
+
+message LogoutUserAttempt {
+    AccessTokenId access_token_id = 1;
+}
+
+message LogoutUserResult {
+    bool success = 1;
+}
